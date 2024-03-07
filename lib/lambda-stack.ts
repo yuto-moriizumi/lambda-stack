@@ -1,4 +1,8 @@
-import { Stack, StackProps, aws_lambda, aws_apigateway } from "aws-cdk-lib";
+import { Stack, StackProps } from "aws-cdk-lib";
+import { HttpApi } from "aws-cdk-lib/aws-apigatewayv2";
+import { HttpLambdaIntegration } from "aws-cdk-lib/aws-apigatewayv2-integrations";
+import { Runtime } from "aws-cdk-lib/aws-lambda";
+import { NodejsFunction } from "aws-cdk-lib/aws-lambda-nodejs";
 import { Construct } from "constructs";
 import path = require("path");
 
@@ -6,14 +10,14 @@ export class LambdaStack extends Stack {
   constructor(scope: Construct, id: string, props?: StackProps) {
     super(scope, id, props);
 
-    const myFunction = new aws_lambda.Function(this, "MyFunction", {
-      runtime: aws_lambda.Runtime.NODEJS_20_X,
-      handler: "index.handler",
-      code: aws_lambda.Code.fromAsset(path.join(__dirname, "handler")),
+    const myFunction = new NodejsFunction(this, "MyFunction", {
+      runtime: Runtime.NODEJS_20_X,
+      handler: "handler",
+      entry: path.join(__dirname, "handler", "index.js"),
     });
 
-    new aws_apigateway.LambdaRestApi(this, "MyApi", {
-      handler: myFunction,
+    new HttpApi(this, "MyApi", {
+      defaultIntegration: new HttpLambdaIntegration("Integration", myFunction),
     });
   }
 }
