@@ -1,0 +1,32 @@
+service: specific-page-subscriber
+frameworkVersion: "3"
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  region: ap-northeast-1
+  timeout: 300
+  httpApi:
+    cors: true
+  vpc:
+    securityGroupIds:
+      - sg-aaa3a1e5
+    subnetIds:
+      - subnet-4e001915
+
+functions:
+  api:
+    handler: main.handler
+    events:
+      - httpApi: "*"
+
+plugins:
+  - serverless-dotenv-plugin
+  - serverless-webpack
+  - serverless-offline
+
+custom:
+  webpack:
+    webpackConfig: webpack.config.ts
+  serverless-offline:
+    httpPort: 4000
